@@ -54,16 +54,35 @@ const UIController = (function() {
     inputType: '.add__type',
     inputDescription: '.add__description',
     inputValue: '.add__value',
-    inputAddBtn: '.add__btn'
+    inputAddBtn: '.add__btn',
+    incomeContainer: '.income__list',
+    expensesContainer: '.expenses__list'
   };
 
   return {
     getDOMnode: key => DOMStrings[key],
     getInputs: _ => ({      
-        type: document.querySelector(DOMStrings.inputType).value,
-        description: document.querySelector(DOMStrings.inputDescription).value,
-        value: document.querySelector(DOMStrings.inputValue).value,
-    })
+      type: document.querySelector(DOMStrings.inputType).value,
+      description: document.querySelector(DOMStrings.inputDescription).value,
+      value: document.querySelector(DOMStrings.inputValue).value,
+    }),
+    addListItem: (data, type) => {
+      let html, newHtml, element;
+      if(type === 'inc') {
+        element = DOMStrings.incomeContainer;
+        html = `<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">+ %value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>`
+      } else if (type === 'exp') {
+        element = DOMStrings.expensesContainer;
+        html = `<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">- %value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>`
+      }
+
+      newHtml = html.replace('%id%', data.id);
+      newHtml = newHtml.replace('%description%', data.description);
+      newHtml = newHtml.replace('%value%', data.value);
+
+      document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+
+    }
   }
 
 })();
@@ -82,10 +101,9 @@ const controller = (function(budgetCtrl, UICtrl) {
   };
 
   const ctrlAddItem = function() { 
-    let input, newItem;
-    input = UICtrl.getInputs();
-    newItem = budgetCtrl.addItem(input.type, input.description, input.value);
-    budgetCtrl.testing();
+    const input = UICtrl.getInputs();
+    const newItem = budgetCtrl.addItem(input.type, input.description, input.value);
+    UICtrl.addListItem(newItem, input.type);
   }
   
   return {
