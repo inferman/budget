@@ -1,24 +1,31 @@
 const budgetController = (function() {
-  // const data = val;
-  const x = 15
-  const add = function(a) {
-    return x + a
-  }
 
   return {
-    publicTest: (b) => add(b)
+    
   }
 })();
+
 
 const UIController = (function() {
 
+  return {
+
+  }
+
 })();
 
-const controller = (function(budgetCtrl, UICtrl) {
-  const test = budgetCtrl.publicTest(10);
 
+const controller = (function(budgetCtrl, UICtrl) {
+  
+  const ctrlAddItem = function() { console.log(`btn was clicked`) }
+  document.querySelector('.add__btn').addEventListener('click', ctrlAddItem)
+  document.addEventListener('keypress', (e) => {
+    const keyCode = (event.keyCode ? event.keyCode : event.which); 
+    if(keyCode !== 13) return;
+    ctrlAddItem();
+  })
   return {
-    callBudgetMethod: _ => test 
+    
   }
 })(budgetController, UIController);
 
