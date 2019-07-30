@@ -18,13 +18,11 @@ const budgetController = (function() {
       exp: []
     },
     totals: {
-      get inc() {
-        return data.allItems.inc.length || 0
-      },
-      get exp() {
-        return data.allItems.exp.length || 0
-      }
-    }
+      inc: 0,
+      exp: 0
+    },
+    budget: 0,
+    percentage: -1
   }
 
   return {
@@ -43,6 +41,28 @@ const budgetController = (function() {
       
       return newItem;
     },
+    calculateBudget: _ => {
+      // Calculate total income and expenses
+      Object.keys(data.totals).forEach(type => {
+        data.totals[type] = data.allItems[type].reduce((acc, curr) => acc + curr.value, 0);
+      });
+
+      // Calculate budget: income - expenses
+      data.budget = data.totals.inc - data.totals.exp;
+
+      // Calculate the percentage of income that we spent
+      if(data.totals.inc) {
+        data.percentage = Math.round((data.totals.exp * 100) / data.totals.inc);
+      } else { data.percentage = -1; }
+      
+      
+    },
+    getBudget: _ => ({
+      budget: data.budget,
+      percentage: data.percentage,
+      totalInc: data.totals.inc,
+      totalExp: data.totals.exp
+    }),
     testing: _ => { console.log(data) }
   }
 })();
@@ -64,7 +84,7 @@ const UIController = (function() {
     getInputs: _ => ({      
       type: document.querySelector(DOMStrings.inputType).value,
       description: document.querySelector(DOMStrings.inputDescription).value,
-      value: document.querySelector(DOMStrings.inputValue).value,
+      value: +document.querySelector(DOMStrings.inputValue).value,
     }),
     addListItem: (data, type) => {
       let html, newHtml, element;
@@ -107,20 +127,45 @@ const controller = (function(budgetCtrl, UICtrl) {
     });
   };
 
+  const updateBudget = function() {
+    // 1. Calculate the budget
+    budgetCtrl.calculateBudget();
+
+    // 2. Return the budget
+    const budget = budgetCtrl.getBudget();
+
+    // 3. Display the budget on the UI
+    console.log(budget);
+  };
+
+  const checkFields = fields => !!fields.filter(field => !!field === false).length;
+
   const ctrlAddItem = function() { 
+    // 1. Get the field input data
     const input = UICtrl.getInputs();
+
+    if(checkFields(Object.values(input))) return 
+
+    // 2. Add the item to the budget controller
     const newItem = budgetCtrl.addItem(input.type, input.description, input.value);
+
+    // 3. Add the item to the UI
     UICtrl.addListItem(newItem, input.type);
+
+    // 4. Clear the fields
     UICtrl.resetFields();
-  }
+
+    // 5. Calculate and update the budget
+    updateBudget();
+
+
+  };
   
   return {
     init: () => {
       setEventListeners();
     },
-    addNewItem: () => {
-      
-    } 
+
   }
 })(budgetController, UIController);
 
