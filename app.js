@@ -82,6 +82,13 @@ const UIController = (function() {
 
       document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
 
+    },
+    resetFields: _ => {
+      const fields = document.querySelectorAll(`${DOMStrings.inputDescription}, ${DOMStrings.inputValue}`);
+      const fieldsArray = [...fields];
+      fieldsArray.forEach( item => item.value = '' );
+      fieldsArray[0].focus();
+      // Array.ptototype.slice.call(fields)
     }
   }
 
@@ -104,6 +111,7 @@ const controller = (function(budgetCtrl, UICtrl) {
     const input = UICtrl.getInputs();
     const newItem = budgetCtrl.addItem(input.type, input.description, input.value);
     UICtrl.addListItem(newItem, input.type);
+    UICtrl.resetFields();
   }
   
   return {
