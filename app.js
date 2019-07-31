@@ -76,7 +76,11 @@ const UIController = (function() {
     inputValue: '.add__value',
     inputAddBtn: '.add__btn',
     incomeContainer: '.income__list',
-    expensesContainer: '.expenses__list'
+    expensesContainer: '.expenses__list',
+    budgetLabel: '.budget__value',
+    incomeLabel: '.budget__income--value',
+    expensesLabel: '.budget__expenses--value',
+    percentagesLabel: '.budget__expenses--percentage'
   };
 
   return {
@@ -109,11 +113,18 @@ const UIController = (function() {
       fieldsArray.forEach( item => item.value = '' );
       fieldsArray[0].focus();
       // Array.ptototype.slice.call(fields)
+    },
+    displayBudget: (obj) => {
+      document.querySelector(DOMStrings.budgetLabel).textContent = obj.budget;
+      document.querySelector(DOMStrings.incomeLabel).textContent = obj.totalInc;
+      document.querySelector(DOMStrings.expensesLabel).textContent = obj.totalExp;
+      obj.percentage > 0
+        ? document.querySelector(DOMStrings.percentagesLabel).textContent = obj.percentage + '%'
+        : document.querySelector(DOMStrings.percentagesLabel).textContent = '---'
     }
   }
 
 })();
-
 
 const controller = (function(budgetCtrl, UICtrl) {
   
@@ -135,7 +146,7 @@ const controller = (function(budgetCtrl, UICtrl) {
     const budget = budgetCtrl.getBudget();
 
     // 3. Display the budget on the UI
-    console.log(budget);
+    UICtrl.displayBudget(budget);
   };
 
   const checkFields = fields => !!fields.filter(field => !!field === false).length;
@@ -164,6 +175,12 @@ const controller = (function(budgetCtrl, UICtrl) {
   return {
     init: () => {
       setEventListeners();
+      updateBudget({
+        budget: 0,
+        percentage: 0,
+        totalInc: 0,
+        totalExp: 0
+      });
     },
 
   }
